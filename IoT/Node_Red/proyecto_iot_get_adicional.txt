@@ -1,0 +1,408 @@
+[
+    {
+        "id": "f033cffa3119fac6",
+        "type": "tab",
+        "label": "Proyecto_get",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c9c6d0568bc544a0",
+        "type": "http response",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "statusCode": "200",
+        "headers": {},
+        "x": 400,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "e97834103a87131e",
+        "type": "json",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": true,
+        "x": 390,
+        "y": 440,
+        "wires": [
+            [
+                "6da1ec03df8e10f3"
+            ]
+        ]
+    },
+    {
+        "id": "6575e11d47044c85",
+        "type": "debug",
+        "z": "f033cffa3119fac6",
+        "d": true,
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 830,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "cc8d9beb4314693f",
+        "type": "ui_text",
+        "z": "f033cffa3119fac6",
+        "group": "2b7ac01b.fc984",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "",
+        "label": "Sensor Name",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 840,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "d95dfe4554754133",
+        "type": "ui_gauge",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "group": "2b7ac01b.fc984",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "RPM",
+        "label": "ºC",
+        "format": "{{value*60}}",
+        "min": 0,
+        "max": "50",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "",
+        "seg2": "",
+        "className": "",
+        "x": 810,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "6da1ec03df8e10f3",
+        "type": "function",
+        "z": "f033cffa3119fac6",
+        "name": "JSON or URL Encoded",
+        "func": "var msg0 = { payload: msg.payload.api_key };\nvar msg1 = { payload: msg.payload.sensor };\nvar msg2 = { payload: msg.payload.value1 };\nvar msg3 = { payload: msg.payload.value2 };\n\n\nreturn [msg0, msg1, msg2, msg3];",
+        "outputs": 4,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 440,
+        "wires": [
+            [
+                "6575e11d47044c85"
+            ],
+            [
+                "cc8d9beb4314693f"
+            ],
+            [
+                "d95dfe4554754133",
+                "053e0e3234cb33ef"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d16b87a040409392",
+        "type": "http in",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "url": "update-sensor",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 160,
+        "y": 360,
+        "wires": [
+            [
+                "c9c6d0568bc544a0",
+                "e97834103a87131e",
+                "6575e11d47044c85"
+            ]
+        ]
+    },
+    {
+        "id": "053e0e3234cb33ef",
+        "type": "change",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "temp1",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 840,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7b672a6cca127ae2",
+        "type": "telegram command",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "command": "rpm",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "12cd4f431de2cd7e",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 160,
+        "y": 620,
+        "wires": [
+            [
+                "6f33388c9ce4ba7c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "6f33388c9ce4ba7c",
+        "type": "function",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "func": "var pwm = flow.get(\"temp1\")\nmsg.payload={\n    \"chatId\": 2110234424,\n    \"type\": \"message\",\n    \"content\": \"RPM=\" + pwm*60\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 620,
+        "wires": [
+            [
+                "caec2f86df07157e"
+            ]
+        ]
+    },
+    {
+        "id": "caec2f86df07157e",
+        "type": "telegram sender",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "bot": "12cd4f431de2cd7e",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 610,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "14b8ce7ef275b453",
+        "type": "telegram receiver",
+        "z": "f033cffa3119fac6",
+        "name": "TSC Lab",
+        "bot": "12cd4f431de2cd7e",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "x": 170,
+        "y": 260,
+        "wires": [
+            [
+                "c06bf38e8aa5ce78"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c06bf38e8aa5ce78",
+        "type": "debug",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 430,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "93c8bcedbfb38ed1",
+        "type": "http in",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "url": "/get-sensor",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 200,
+        "y": 840,
+        "wires": [
+            [
+                "f7dc09b9dd5b88e6"
+            ]
+        ]
+    },
+    {
+        "id": "438a619cded815e0",
+        "type": "http response",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "statusCode": "300",
+        "headers": {},
+        "x": 560,
+        "y": 800,
+        "wires": []
+    },
+    {
+        "id": "f7dc09b9dd5b88e6",
+        "type": "function",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "func": "var duty = global.get(\"pwm1\")\nmsg.payload= duty\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 840,
+        "wires": [
+            [
+                "438a619cded815e0",
+                "6b79912cdf3d1e10"
+            ]
+        ]
+    },
+    {
+        "id": "6b79912cdf3d1e10",
+        "type": "debug",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 570,
+        "y": 868,
+        "wires": []
+    },
+    {
+        "id": "345a3e224babc08d",
+        "type": "telegram receiver",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "bot": "12cd4f431de2cd7e",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "x": 210,
+        "y": 720,
+        "wires": [
+            [
+                "d868effe97cebd6f"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d868effe97cebd6f",
+        "type": "change",
+        "z": "f033cffa3119fac6",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "pwm1",
+                "pt": "global",
+                "to": "payload.content",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2b7ac01b.fc984",
+        "type": "ui_group",
+        "name": "SENSORS",
+        "tab": "99ab8dc5.f435c",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "12cd4f431de2cd7e",
+        "type": "telegram bot",
+        "botname": "TscLabczuniga_bot",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "99ab8dc5.f435c",
+        "type": "ui_tab",
+        "name": "HTTP",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
